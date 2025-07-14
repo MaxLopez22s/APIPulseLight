@@ -17,8 +17,8 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('Conectado a MongoDB Atlas'))
-.catch(err => console.error('Error al conectar con MongoDB:', err));
+.then(() => console.log('✅ Conectado a MongoDB Atlas'))
+.catch(err => console.error('❌ Error al conectar con MongoDB:', err));
 
 // Esquema y Modelo de datos
 const pulselightSchema = new mongoose.Schema({
@@ -26,6 +26,9 @@ const pulselightSchema = new mongoose.Schema({
   lux: Number,
   ambiente: String,
   timestamp: Number,
+  accel_x: Number,
+  accel_y: Number,
+  accel_z: Number,
   fecha: { type: Date, default: Date.now }
 });
 
@@ -34,12 +37,30 @@ const PulselightDato = mongoose.model('PulselightDato', pulselightSchema);
 // Ruta para recibir datos desde el smartphone
 app.post('/api/datos', async (req, res) => {
   try {
-    const { bpm, lux, ambiente, timestamp } = req.body;
-    const nuevoDato = new PulselightDato({ bpm, lux, ambiente, timestamp });
+    const {
+      bpm,
+      lux,
+      ambiente,
+      timestamp,
+      accel_x,
+      accel_y,
+      accel_z
+    } = req.body;
+
+    const nuevoDato = new PulselightDato({
+      bpm,
+      lux,
+      ambiente,
+      timestamp,
+      accel_x,
+      accel_y,
+      accel_z
+    });
+
     await nuevoDato.save();
-    res.status(201).json({ mensaje: 'Dato guardado correctamente' });
+    res.status(201).json({ mensaje: '✅ Dato guardado correctamente' });
   } catch (error) {
-    console.error('Error al guardar:', error);
+    console.error('❌ Error al guardar:', error);
     res.status(500).json({ error: 'Error del servidor' });
   }
 });
@@ -56,5 +77,5 @@ app.get('/api/datos', async (req, res) => {
 
 // Iniciar servidor
 app.listen(PORT, () => {
-  console.log(`Servidor escuchando en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
 });
